@@ -1,0 +1,151 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/navigation1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:background="@color/colorPrimary"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="top"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnDayOrNight"
+
+            android:layout_width="22dp"
+
+            android:layout_height="22dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="3dp"
+            android:background="@color/colorPrimary"
+            android:linksClickable="false"
+            android:text="夜"
+            android:textColor="@color/white"
+            android:textSize="13dp"
+            android:visibility="visible" />
+
+        <EditText
+            android:id="@+id/editUrl1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="3dp"
+            android:layout_weight="2"
+            android:background="@android:drawable/editbox_background_normal"
+            android:ems="10"
+            android:hint="请输入网址"
+            android:imeOptions="actionGo"
+            android:singleLine="true"
+            android:textSize="15sp"></EditText>
+
+        <Button
+            android:id="@+id/btnGo1"
+            android:layout_width="wrap_content"
+            android:layout_height="25sp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="3dp"
+            android:layout_weight="1"
+
+            android:background="@color/colorPrimary"
+            android:linksClickable="false"
+            android:text="进入"
+            android:textColor="@color/white"
+            android:textSize="15dp"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:alpha="0.9"
+        android:background="@android:drawable/progress_horizontal"
+        android:max="100"
+        android:progress="1" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/webView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></FrameLayout>
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/toolbar1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/day"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnBack1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2.5dp"
+            android:layout_weight="1"
+            android:background="@color/day"
+            android:padding="10dp"
+            android:src="@drawable/theme_toolbar_btn_back_fg_normal0" />
+
+        <ImageButton
+            android:id="@+id/btnForward1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2.5dp"
+            android:layout_weight="1"
+            android:background="@color/day"
+            android:padding="10dp"
+            android:src="@drawable/theme_toolbar_btn_forward_fg_normal0" />
+
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2.5dp"
+            android:layout_weight="1"
+            android:background="@color/day"
+            android:padding="10dp"
+            android:src="@drawable/theme_toolbar_btn_menu_fg_normal" />
+
+        <ImageButton
+            android:id="@+id/btnHome1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2.5dp"
+            android:layout_weight="1"
+            android:background="@color/day"
+            android:padding="10dp"
+            android:src="@drawable/theme_toolbar_btn_home_fg_normal2" />
+
+        <ImageButton
+            android:id="@+id/btnExit1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2.5dp"
+            android:layout_weight="1"
+            android:background="@color/day"
+            android:padding="10dp"
+            android:src="@drawable/theme_menu_btn_quit_fg_normal0" />
+    </LinearLayout>
+
+</LinearLayout>
