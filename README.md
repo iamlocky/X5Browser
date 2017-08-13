@@ -26,7 +26,7 @@ Add it in your root build.gradle at the end of repositories:
 Add the dependency
 
     dependencies {
-	        compile 'com.github.iamlocky:X5Browser:1.0.0'
+	        compile 'com.github.iamlocky:X5Browser:1.0.1'
 	}
 
 #2.复制manifests中的权限和三个activity标签
