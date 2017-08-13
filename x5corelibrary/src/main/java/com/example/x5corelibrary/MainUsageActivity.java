@@ -18,7 +18,7 @@ import android.widget.SimpleAdapter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MainActivity extends Activity {
+public class MainUsageActivity extends Activity {
 
 	public static boolean firstOpening = true;
 	private static String[] titles = null;
@@ -99,26 +99,24 @@ public class MainActivity extends Activity {
 					Intent intent = null;
 					switch (position) {
 					case FILE_CHOOSER: {
-						intent = new Intent(MainActivity.this,
+						intent = new Intent(MainUsageActivity.this,
 								FilechooserActivity.class);
-						MainActivity.this.startActivity(intent);
+						MainUsageActivity.this.startActivity(intent);
 
 					}
 						break;
 					case FULL_SCREEN_VIDEO: {
-						intent = new Intent(MainActivity.this,
+						intent = new Intent(MainUsageActivity.this,
 								FullScreenActivity.class);
-						MainActivity.this.startActivity(intent);
+						MainUsageActivity.this.startActivity(intent);
 					}
 						break;
 
 					case TBS_WEB: {
-						BrowserActivity.init(MainActivity.this,"http://m.hao.360.cn",true,0);//带url启动
-//						BrowserActivity.init(MainActivity.this,true,0);//不带url启动
+						BrowserActivity.init(MainUsageActivity.this,"http://m.hao.360.cn",true,0);//带url启动
+//						BrowserActivity.init(MainUsageActivity.this,true,0);//不带url启动
 
-//						intent = new Intent(MainActivity.this,
-//								BrowserActivity.class);
-//						MainActivity.this.startActivity(intent);
+;
 
 					}
 						break;

@@ -3,13 +3,13 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".BrowserActivity">
 
     <LinearLayout
         android:id="@+id/navigation1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="0.8"
+        android:alpha="0.9"
         android:background="@color/colorPrimary"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -19,9 +19,8 @@
         <Button
             android:id="@+id/btnDayOrNight"
 
-            android:layout_width="22dp"
-
-            android:layout_height="22dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginBottom="3dp"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="3dp"
@@ -35,27 +34,32 @@
         <EditText
             android:id="@+id/editUrl1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="25dp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="5dp"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="5dp"
             android:layout_weight="2"
-            android:background="@android:drawable/editbox_background_normal"
+            android:background="@null"
             android:ems="10"
             android:hint="请输入网址"
             android:imeOptions="actionGo"
             android:singleLine="true"
-            android:textSize="15sp"></EditText>
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textColorHighlight="#c2c2c2"
+            >
+
+        </EditText>
 
         <Button
             android:id="@+id/btnGo1"
-            android:layout_width="wrap_content"
-            android:layout_height="25sp"
-            android:layout_marginBottom="3dp"
+            android:layout_width="40dp"
+            android:layout_height="25dp"
             android:layout_marginRight="5dp"
-            android:layout_marginTop="3dp"
-            android:layout_weight="1"
-
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="3dp"
             android:background="@color/colorPrimary"
             android:linksClickable="false"
             android:text="进入"
@@ -67,13 +71,13 @@
 
     <ProgressBar
         android:id="@+id/progressBar1"
-        style="?android:progressBarStyleHorizontal"
+        style="@style/progressBarHorizontalPrimary"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="3dp"
         android:alpha="0.9"
-        android:background="@android:drawable/progress_horizontal"
+        android:background="@color/colorPrimary"
         android:max="100"
-        android:progress="1" />
+        android:progress="10" />
 
     <RelativeLayout
         android:layout_width="match_parent"

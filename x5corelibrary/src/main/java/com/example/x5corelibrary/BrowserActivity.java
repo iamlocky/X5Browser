@@ -1,15 +1,20 @@
 package com.example.x5corelibrary;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +23,9 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,8 +33,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 
+import com.example.x5corelibrary.utils.StatusBarCompat;
+import com.example.x5corelibrary.utils.StringUtils;
 import com.example.x5corelibrary.utils.ToastUtil;
 import com.example.x5corelibrary.utils.X5WebView;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
@@ -43,6 +54,9 @@ import com.tencent.smtt.utils.TbsLog;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 
 public class BrowserActivity extends Activity {
     /**
@@ -61,11 +75,7 @@ public class BrowserActivity extends Activity {
     private LinearLayout mToolbar;
     private EditText mUrl;
     private String currentUrl;
-    private static String mHomeUrl = "http://m.baidu.com";
-    private static final String TAG = "X5Sdk";
-    private static final int MAX_LENGTH = 18;
-    private static final int pressColor = 0x4C000000;
-    private static int normalColor = 0xECF0F2;
+    private InputMethodManager imm;
     private boolean mNeedTestPage = false;
 
     private final int disable = 120;
@@ -76,48 +86,69 @@ public class BrowserActivity extends Activity {
 
     private URL mIntentUrl;
 
+    private static final String TAG = "X5Sdk";
+    private static final int MAX_LENGTH = 18;
+    private static final int pressColor = 0x4C000000;
+    private static int normalColor = 0xECF0F2;
     private static boolean isDayMode = true;
     public static int colorPrimary = 0;
+    private static String mHomeUrl = "http://m.baidu.com";
 
-    public static void init(Activity context, boolean isDayMode, int defaultColorPrimary) {//不带url启动
+    public static void init(@NonNull Activity context,@NonNull boolean isDayMode, int defaultColorPrimary) {//不带url启动
+
 
         if (isHexNumber(defaultColorPrimary + "")) {
             setColorPrimary(defaultColorPrimary);
+            Log.d("init", "-----------defaultColorPrimary-----------");
+            Log.d("init", "----------" + defaultColorPrimary + "-----------");
         }
         setDayMode(isDayMode);
         context.startActivity(new Intent(context, BrowserActivity.class));
     }
 
-    public static void init(Activity context, String url, boolean isDayMode, int defaultColorPrimary) {//带url启动
-        if (url != null) {
-            try {
-                if(url.indexOf("http")==-1){
-                    url="http://"+url;
-                }
-                mHomeUrl = (new URL(url).toString());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                mHomeUrl="http://m.baidu.com";
-            }
-        }
+    public static void init(@NonNull Activity context,@NonNull String url,@NonNull boolean isDayMode, int defaultColorPrimary) {//带url启动
+        mHomeUrl = checkUrl(url);
         init(context, isDayMode, defaultColorPrimary);
     }
 
     private static void setDayMode(boolean dayMode) {
-        if (!isDayMode) {
-            Log.d("night mode", "夜间模式状态改变，无法修改");
-            return;
+        if (isDayMode) {
+
         }
         isDayMode = dayMode;
     }
 
+    private static String checkUrl(@NonNull String url) {//检查url是否正确
+        if (url != null) {
+            try {
+                if (url.indexOf("http") == -1) {
+                    url = "http://" + url.trim();
+                }
+                {
+                    url.replaceAll("[\u4e00-\u9fa5]","")
+                            .replaceAll(" ","")
+                            .replaceAll("\n","");//去除中文和空格换行
+                }
+                {
+                    url= StringUtils.fullToHalf(url);
+                }
+                url = (new URL(url).toString());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                url = "http://m.baidu.com";
+            }
+        }
+        return url;
+    }
+
     private static void setColorPrimary(int defaultColorPrimary) {
+
         colorPrimary = defaultColorPrimary;
     }
 
 
     //判断十六进制
-    private static boolean isHexNumber(String str) {
+    private static boolean isHexNumber(@NonNull String str) {
         boolean flag = false;
         for (int i = 0; i < str.length(); i++) {
             char cc = str.charAt(i);
@@ -134,52 +165,73 @@ public class BrowserActivity extends Activity {
         super.onCreate(savedInstanceState);
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
         context = BrowserActivity.this;
-        try {//检查颜色是否为透明
-            if (colorPrimary == 0) {
-                setColorPrimary(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
-                normalColor = ResourcesCompat.getColor(getResources(), R.color.day, null);
-            } else {
-                mGo.setBackgroundColor(colorPrimary);
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            setColorPrimary(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
-            normalColor = ResourcesCompat.getColor(getResources(), R.color.day, null);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+            }
         }
 
+
+        try {//检查颜色是否为0
+            if (colorPrimary == 0) {
+                setColorPrimary(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, getTheme()));
+                normalColor = ResourcesCompat.getColor(getResources(), R.color.day, getTheme());
+
+            } else {
+                Log.d("color", colorPrimary + "");
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    Window window=getWindow();
+//                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//                    window.setStatusBarColor(colorPrimary);
+                StatusBarCompat.compat(this,colorPrimary);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+     }
+
+
         Intent intent = getIntent();
-        if (intent != null) {
+        if (intent != null) {//intent方式获取url
             try {
                 mIntentUrl = new URL(intent.getData().toString());
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
-
+                e.printStackTrace();
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         //
         try {
-            if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 11) {
+            if (Integer.parseInt(Build.VERSION.SDK) >= 11) {
                 getWindow()
                         .setFlags(
-                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                                android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+                                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
-		/*
-         * getWindow().addFlags(
-		 * android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		 */
         setContentView(R.layout.activity_browser);
         mViewParent = (ViewGroup) findViewById(R.id.webView1);
 
+        //-------------------------------------------------initview
         initBtnListenser();
+        initColor();
+
 
         mTestHandler.sendEmptyMessageDelayed(MSG_INIT_UI, 10);
+
+    }
+
+    private void initColor() {
+        LinearLayout navi = findViewById(R.id.navigation1);
+        navi.setBackgroundColor(colorPrimary);
 
     }
 
@@ -204,17 +256,21 @@ public class BrowserActivity extends Activity {
 
     private void initProgressBar() {
         mPageLoadingProgressBar = (ProgressBar) findViewById(R.id.progressBar1);// new
-        // ProgressBar(getApplicationContext(),
-        // null,
-        // android.R.attr.progressBarStyleHorizontal);
-//		mPageLoadingProgressBar.setMax(100);
-//		mPageLoadingProgressBar.setProgressDrawable(this.getResources()
-//				.getDrawable(R.drawable.color_progressbar));
+        mPageLoadingProgressBar.setBackgroundColor(colorPrimary);
+
     }
 
     private void init() {
 
-        mWebView = new X5WebView(this, null);
+        mWebView = new X5WebView(this, null) {
+            @Override
+            public void loadUrl(String s) {//----------重写，添加检查url合法性
+                s=checkUrl(s);
+                mWebView.requestFocus();
+                mGo.setVisibility(GONE);
+                super.loadUrl(s);
+            }
+        };
 
         mViewParent.addView(mWebView, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -229,11 +285,10 @@ public class BrowserActivity extends Activity {
                 return false;
             }
 
-
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                // mTestHandler.sendEmptyMessage(MSG_OPEN_TEST_URL);
+//                mTestHandler.sendEmptyMessage(MSG_OPEN_TEST_URL);
 //                mTestHandler.sendEmptyMessageDelayed(MSG_OPEN_TEST_URL, 5000);// 5s?
                 if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 16)
                     changGoForwardButton(view);
@@ -294,6 +349,13 @@ public class BrowserActivity extends Activity {
             public void onProgressChanged(WebView webView, int i) {
                 super.onProgressChanged(webView, i);
                 mPageLoadingProgressBar.setProgress(i);
+                if (i >= 99) {
+                    mPageLoadingProgressBar.setVisibility(View.GONE);
+                } else {
+                    if (mPageLoadingProgressBar.getVisibility() != View.VISIBLE) {
+                        mPageLoadingProgressBar.setVisibility(View.VISIBLE);
+                    }
+                }
             }
 
             @Override
@@ -310,59 +372,61 @@ public class BrowserActivity extends Activity {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                    if (mGo.getVisibility() != View.GONE) {//--------隐藏go按钮
-                        mGo.setVisibility(View.GONE);
-                        String title = mWebView.getTitle();
-                        if (title != null && title.length() > MAX_LENGTH)
-                            mUrl.setText(title.subSequence(0, MAX_LENGTH) + "...");
-                        else
-                            mUrl.setText(title);
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                        mWebView.requestFocus();
-                    }
-                    return false;
+                if (mGo.getVisibility() != View.GONE) {//--------隐藏go按钮
+                    mGo.setVisibility(View.GONE);
+                    String title = mWebView.getTitle();
+                    if (title != null && title.length() > MAX_LENGTH)
+                        mUrl.setText(title.subSequence(0, MAX_LENGTH) + "...");
+                    else
+                        mUrl.setText(title);
+                    imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    mWebView.requestFocus();
+                }
+                return false;
 
 
             }
         });
-        mWebView.setDayOrNight(isDayMode);
 
-//        mWebView.setDownloadListener(new DownloadListener() {
-//            @Override
-//            public void onDownloadStart(String arg0, String s1, String s2, String s3, long l) {
-//                {//部分x5内核无效
-//                    TbsLog.d(TAG, "url: " + arg0);
-//                    new AlertDialog.Builder(BrowserActivity.this)
-//                            .setTitle("是否下载？")
-//                            .setMessage(arg0)
-//                            .setPositiveButton("立即下载",
-//                                    (dialog, which) ->
-//                                    {
-//                                        Uri uri = Uri.parse(arg0);
-//                                        Intent downloadIntent = new Intent(Intent.ACTION_VIEW, uri);
-//                                        startActivity(downloadIntent);
-//
-//                                        ToastUtil.show(
-//                                                context,
-//                                                "开始下载");
-//                                    })
-//                            .setNegativeButton("取消",
-//                                    (dialog, which) ->
-//                                    {
-//                                        ;
-//                                        ToastUtil.show(
-//                                                context,
-//                                                "取消下载");
-//                                    })
-//                            .setOnCancelListener(
-//                                    dialog ->
-//                                    {
-//                                        //
-//                                    }).show();
-//                }
-//            }
-//        });
+        mWebView.setDownloadListener(new DownloadListener() {
+            @Override
+            public void onDownloadStart(String arg0, String s1, String s2, String s3, long l) {
+                {//部分x5内核无效
+                    TbsLog.d(TAG, "url: " + arg0);
+                    final String url = arg0;
+                    new AlertDialog.Builder(BrowserActivity.this)
+                            .setTitle("是否下载？")
+                            .setMessage(arg0)
+                            .setPositiveButton("立即下载", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Uri uri = Uri.parse(url);
+                                    Intent downloadIntent = new Intent(Intent.ACTION_VIEW, uri);
+                                    startActivity(downloadIntent);
+
+                                    ToastUtil.show(
+                                            context,
+                                            "开始下载");
+                                }
+                            })
+                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    ToastUtil.show(
+                                            context,
+                                            "取消下载");
+                                }
+                            })
+                            .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialogInterface) {
+
+                                }
+                            }).show();
+                }
+            }
+        });
 
         WebSettings webSetting = mWebView.getSettings();
         webSetting.setAllowFileAccess(true);
@@ -397,7 +461,39 @@ public class BrowserActivity extends Activity {
         CookieSyncManager.createInstance(this);
         CookieSyncManager.getInstance().sync();
 
+        setMode();
+    }
 
+    private void setMode() {//设置夜间模式开关
+        {
+            mWebView.setDayOrNight(isDayMode);
+            if (isDayMode) {
+                mMode.setBackgroundColor(colorPrimary);
+                mMode.setText("夜");
+
+                mBack.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
+                mForward.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
+                mExit.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
+                mHome.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
+                mMore.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
+                mToolbar.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
+                normalColor = ResourcesCompat.getColor(getResources(), R.color.day, null);
+
+            } else {
+                mMode.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+                //mMode.setText("日");
+
+                mBack.setBackgroundColor(colorPrimary);
+                mForward.setBackgroundColor(colorPrimary);
+                mExit.setBackgroundColor(colorPrimary);
+                mHome.setBackgroundColor(colorPrimary);
+                mMore.setBackgroundColor(colorPrimary);
+                mToolbar.setBackgroundColor(colorPrimary);
+
+                normalColor = colorPrimary;
+            }
+            mWebView.reload();
+        }
     }
 
     private void initBtnListenser() {
@@ -410,7 +506,7 @@ public class BrowserActivity extends Activity {
         mMore = (ImageButton) findViewById(R.id.btnMore);
         mMode = (Button) findViewById(R.id.btnDayOrNight);
         mToolbar = (LinearLayout) findViewById(R.id.toolbar1);
-
+        mGo.setBackgroundColor(colorPrimary);
         if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 16) {
             mBack.setAlpha(disable);
             mForward.setAlpha(disable);
@@ -423,28 +519,12 @@ public class BrowserActivity extends Activity {
             public void onClick(View view) {
                 {
                     if (isDayMode) {
-                        isDayMode = false;//--------------夜间模式
-                        mBack.setBackgroundColor(colorPrimary);
-                        mForward.setBackgroundColor(colorPrimary);
-                        mExit.setBackgroundColor(colorPrimary);
-                        mHome.setBackgroundColor(colorPrimary);
-                        mMore.setBackgroundColor(colorPrimary);
-                        mToolbar.setBackgroundColor(colorPrimary);
-                        mMode.setText("日");
-                        normalColor = colorPrimary;
+                        isDayMode = false;//--------------is夜间模式
+                        setMode();
                     } else {
-                        isDayMode = true;
-                        mBack.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
-                        mForward.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
-                        mExit.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
-                        mHome.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
-                        mMore.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
-                        mToolbar.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.day, null));
-                        mMode.setText("夜");
-                        normalColor = ResourcesCompat.getColor(getResources(), R.color.day, null);
+                        isDayMode = true;//--------------is日间模式
+                        setMode();
                     }
-                    mWebView.setDayOrNight(isDayMode);
-                    mWebView.reload();
                 }
             }
         });
@@ -492,13 +572,6 @@ public class BrowserActivity extends Activity {
         });
 
 
-        mUrl.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                return false;
-            }
-        });
-
         mUrl.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -527,11 +600,12 @@ public class BrowserActivity extends Activity {
                         mUrl.setText(title.subSequence(0, MAX_LENGTH) + "...");
                     else
                         mUrl.setText(title);
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
             }
         });
+
 
         mUrl.addTextChangedListener(new TextWatcher() {
 
@@ -571,6 +645,18 @@ public class BrowserActivity extends Activity {
             }
         });
 
+        mUrl.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == KeyEvent.ACTION_DOWN || i == EditorInfo.IME_ACTION_GO){
+                    mWebView.loadUrl(mUrl.getText().toString());
+
+                    //mWebView.requestFocus();
+                }
+                return true;
+            }
+        });
+
         mHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -582,7 +668,7 @@ public class BrowserActivity extends Activity {
         mExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Process.killProcess(Process.myPid());
+
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                 dialog.setTitle("X5浏览器");
                 dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -593,6 +679,7 @@ public class BrowserActivity extends Activity {
                         if (mWebView != null)
                             mWebView.destroy();
                         finish();
+                        //Process.killProcess(Process.myPid());
                     }
                 });
                 dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -612,6 +699,15 @@ public class BrowserActivity extends Activity {
         mHome.setOnTouchListener(touchListener);
         mMore.setOnTouchListener(touchListener);
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PERMISSION_GRANTED){
+            ToastUtil.show(getApplicationContext(),"获取读写内部存储权限失败");
+        }
     }
 
     boolean[] m_selected = new boolean[]{true, true, true, true, false,
@@ -668,11 +764,16 @@ public class BrowserActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy() {//销毁时重置
         if (mTestHandler != null)
             mTestHandler.removeCallbacksAndMessages(null);
         if (mWebView != null)
             mWebView.destroy();
+        Log.d("locky ", "销毁browser");
+        setContentView(new View(BrowserActivity.this));
+        colorPrimary = 0;
+        isDayMode = true;
+        mHomeUrl = "http://m.baidu.com";
         super.onDestroy();
     }
 
