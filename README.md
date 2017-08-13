@@ -1,6 +1,7 @@
 # X5Browser
-##基于腾讯x5内核的精简版浏览器
-##适用于需要单独的页面显示web内容，官方webview不能满足需求的场景
+## 基于腾讯x5内核的精简版浏览器
+## 适用于需要单独的页面显示web内容，官方webview不能满足需求的场景
+# 
 ![enter image description here](https://github.com/iamlocky/X5Browser/blob/master/shots/Screenshot_2017-08-13-16-23-04-002_com.example.lo.png?raw=true)
 # 
 ![enter image description here](https://github.com/iamlocky/X5Browser/blob/master/shots/Screenshot_2017-08-13-16-23-30-700_com.example.lo.png?raw=true)
