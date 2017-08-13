@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
                 "1.按要求修改项目https://x5.tencent.com/tbs/guide/sdkInit.html\n" +
                 "2.复制manifests中的权限和三个activity标签\n" +
                 "3.在你的app中调用BrowserActivity.init()\n" +
-                "");
+                "\n虽然BrowserActivity会动态申请sd权限，为避免不可预测的bug最好先动态申请manifest中需要的权限再启动");
 
         textView1 = (TextView) findViewById(R.id.tv_hello);
         textView1.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.colorBlueDark, getTheme()));
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (v.getId()) {
             case R.id.tv_hello://带网址夜间
-                BrowserActivity.init(this, "cy-ber.cn", false, ResourcesCompat.getColor(getResources(), R.color.colorBlueDark, getTheme()));
+                BrowserActivity.init(this, "https://x5.tencent.com/tbs/guide/sdkInit.html", false, ResourcesCompat.getColor(getResources(), R.color.colorBlueDark, getTheme()));
                 break;
 
             case R.id.tv_hello2://不带网址白天
