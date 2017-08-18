@@ -1,6 +1,6 @@
 # X5Browser
 
-## gituhb地址 https://github.com/iamlocky/X5Browser
+## github地址 https://github.com/iamlocky/X5Browser
 ## 基于腾讯x5内核的精简版浏览器
 ## 适用于需要单独的页面显示web内容，官方webview不能满足需求的场景
 # 
