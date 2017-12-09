@@ -19,6 +19,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +37,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
+import com.example.x5corelibrary.utils.DensityUtils;
+import com.example.x5corelibrary.utils.ItemLongClickedPopWindow;
+import com.example.x5corelibrary.utils.SaveImage;
 import com.example.x5corelibrary.utils.StatusBarCompat;
 import com.example.x5corelibrary.utils.StringUtils;
 import com.example.x5corelibrary.utils.ToastUtil;
@@ -77,7 +81,8 @@ public class BrowserActivity extends Activity {
     private String currentUrl;
     private InputMethodManager imm;
     private boolean mNeedTestPage = false;
-
+    private int downX = 100;
+    private int downY = 100;
     private final int disable = 120;
     private final int enable = 255;
     private ProgressBar mPageLoadingProgressBar = null;
@@ -85,7 +90,7 @@ public class BrowserActivity extends Activity {
     private ValueCallback<Uri> uploadFile;
 
     private URL mIntentUrl;
-
+    private String imgurl;
     private static final String TAG = "X5Sdk";
     private static final int MAX_LENGTH = 18;
     private static final int pressColor = 0x4C000000;
@@ -94,7 +99,7 @@ public class BrowserActivity extends Activity {
     public static int colorPrimary = 0;
     private static String mHomeUrl = "http://m.baidu.com";
 
-    public static void init(@NonNull Activity context,@NonNull boolean isDayMode, int defaultColorPrimary) {//不带url启动
+    public static void init(@NonNull Activity context, @NonNull boolean isDayMode, int defaultColorPrimary) {//不带url启动
 
 
         if (isHexNumber(defaultColorPrimary + "")) {
@@ -106,7 +111,7 @@ public class BrowserActivity extends Activity {
         context.startActivity(new Intent(context, BrowserActivity.class));
     }
 
-    public static void init(@NonNull Activity context,@NonNull String url,@NonNull boolean isDayMode, int defaultColorPrimary) {//带url启动
+    public static void init(@NonNull Activity context, @NonNull String url, @NonNull boolean isDayMode, int defaultColorPrimary) {//带url启动
         mHomeUrl = checkUrl(url);
         init(context, isDayMode, defaultColorPrimary);
     }
@@ -125,12 +130,12 @@ public class BrowserActivity extends Activity {
                     url = "http://" + url.trim();
                 }
                 {
-                    url.replaceAll("[\u4e00-\u9fa5]","")
-                            .replaceAll(" ","")
-                            .replaceAll("\n","");//去除中文和空格换行
+                    url.replaceAll("[\u4e00-\u9fa5]", "")
+                            .replaceAll(" ", "")
+                            .replaceAll("\n", "");//去除中文和空格换行
                 }
                 {
-                    url= StringUtils.fullToHalf(url);
+                    url = StringUtils.fullToHalf(url);
                 }
                 url = (new URL(url).toString());
             } catch (MalformedURLException e) {
@@ -186,11 +191,11 @@ public class BrowserActivity extends Activity {
 //                    Window window=getWindow();
 //                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 //                    window.setStatusBarColor(colorPrimary);
-                StatusBarCompat.compat(this,colorPrimary);
+                StatusBarCompat.compat(this, colorPrimary);
             }
         } catch (Exception e) {
             e.printStackTrace();
-     }
+        }
 
 
         Intent intent = getIntent();
@@ -265,7 +270,7 @@ public class BrowserActivity extends Activity {
         mWebView = new X5WebView(this, null) {
             @Override
             public void loadUrl(String s) {//----------重写，添加检查url合法性
-                s=checkUrl(s);
+                s = checkUrl(s);
                 mWebView.requestFocus();
                 mGo.setVisibility(GONE);
                 super.loadUrl(s);
@@ -386,6 +391,72 @@ public class BrowserActivity extends Activity {
                 return false;
 
 
+            }
+        });
+
+        mWebView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                downX = (int) motionEvent.getX();
+                downY = (int) motionEvent.getY();
+                return false;
+            }
+        });
+        mWebView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                final ItemLongClickedPopWindow itemLongClickedPopWindow;
+                final WebView.HitTestResult result = mWebView.getHitTestResult();
+                if (null == result)
+                    return false;
+                int type = result.getType();
+                if (type == WebView.HitTestResult.UNKNOWN_TYPE)
+                    return false;
+                if (type == WebView.HitTestResult.EDIT_TEXT_TYPE) {
+                    //let TextViewhandles context menu return true;
+                }
+                itemLongClickedPopWindow = new ItemLongClickedPopWindow(BrowserActivity.this, ItemLongClickedPopWindow.IMAGE_VIEW_POPUPWINDOW, DensityUtils.dip2px(getApplicationContext(), 120), DensityUtils.dip2px(getApplicationContext(), 90));
+                // Setup custom handlingdepending on the type
+                switch (type) {
+                    case WebView.HitTestResult.PHONE_TYPE: // 处理拨号
+                        break;
+                    case WebView.HitTestResult.EMAIL_TYPE: // 处理Email
+                        break;
+                    case WebView.HitTestResult.GEO_TYPE: // TODO
+                        break;
+                    case WebView.HitTestResult.SRC_ANCHOR_TYPE: // 超链接
+                        // Log.d(DEG_TAG, "超链接");
+                        break;
+                    case WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE:
+                        break;
+                    case WebView.HitTestResult.IMAGE_TYPE: // 处理长按图片的菜单项
+                        imgurl = result.getExtra();
+                        //通过GestureDetector获取按下的位置，来定位PopWindow显示的位置
+                        itemLongClickedPopWindow.showAtLocation(view, Gravity.TOP | Gravity.LEFT, downX, downY + 10);
+                        break;
+                    default:
+                        break;
+                }
+
+                itemLongClickedPopWindow.getView(R.id.item_longclicked_viewImage)
+                        .setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                itemLongClickedPopWindow.dismiss();
+                                mWebView.loadUrl(result.getExtra());
+                            }
+                        });
+
+                itemLongClickedPopWindow.getView(R.id.item_longclicked_saveImage)
+                        .setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                itemLongClickedPopWindow.dismiss();
+                                new SaveImage().execute(result.getExtra());
+                            }
+                        });
+
+                return false;
             }
         });
 
@@ -648,7 +719,7 @@ public class BrowserActivity extends Activity {
         mUrl.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == KeyEvent.ACTION_DOWN || i == EditorInfo.IME_ACTION_GO){
+                if (i == KeyEvent.ACTION_DOWN || i == EditorInfo.IME_ACTION_GO) {
                     mWebView.loadUrl(mUrl.getText().toString());
 
                     //mWebView.requestFocus();
@@ -704,9 +775,9 @@ public class BrowserActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)!=PERMISSION_GRANTED){
-            ToastUtil.show(getApplicationContext(),"获取读写内部存储权限失败");
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
+            ToastUtil.show(getApplicationContext(), "获取读写内部存储权限失败");
         }
     }
 

@@ -5,5 +5,10 @@
 /.idea/libraries
 .DS_Store
 /build
+/app/build
+/x5corelibrary/build
 /captures
 .externalNativeBuild
+.idea/markdown-navigator/
+.idea/modules.xml
+.idea/vcs.xml
