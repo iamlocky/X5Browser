@@ -1,67 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.lockyluo.x5browser.MainActivity">
-
-    <TextView
-        android:id="@+id/tv_hello"
-        android:gravity="bottom|center_horizontal"
-        android:onClick="onClick"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:text="带网址!1"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/tv_hello2"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="0.926"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
-    <TextView
-        android:textSize="20sp"
-        android:id="@+id/tv_hello2"
-        android:gravity="bottom|center_horizontal"
-        android:onClick="onClick"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="不带网址（默认首页百度）!2"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintVertical_bias="0.573"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
+    android:orientation="vertical"
+    tools:context="cn.lockyluo.x5browser.MainActivity">
 
     <TextView
         android:id="@+id/tv_tips"
-        android:layout_width="0dp"
-        android:layout_height="213dp"
-        android:gravity="center_vertical"
-        android:text="TextView"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/tv_hello"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="8dp"
         android:layout_marginRight="5dp"
-        android:layout_marginLeft="5dp" />
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/tv_hello"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="bottom|center_horizontal"
+        android:onClick="onClick"
+        android:text="带网址!1"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tv_hello2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="bottom|center_horizontal"
+        android:onClick="onClick"
+        android:text="不带网址（默认首页百度）!2"
+        android:textSize="20sp" />
 
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="安装本地x5"
+            android:onClick="btn1Click"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:onClick="btn2Click"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:onClick="btn3Click"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:onClick="btn4Click"/>
+    </LinearLayout>
+
+
+</LinearLayout>

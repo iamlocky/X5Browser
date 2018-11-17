@@ -7,13 +7,13 @@
         android:id="@+id/frame_web_video"></FrameLayout>
     
 
-    <com.example.webview_x5browser.utils.X5WebView
+    <com.lockyluo.webview_x5browser.utils.X5WebView
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:id="@+id/web_filechooser">
         
         
-    </com.example.webview_x5browser.utils.X5WebView>
+    </com.lockyluo.webview_x5browser.utils.X5WebView>
     
 
 </RelativeLayout>

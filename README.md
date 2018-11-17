@@ -51,15 +51,15 @@ Add the dependency
 ```
 <!--activity复制开始-->
         <activity
-            android:name="com.example.x5corelibrary.FullScreenActivity"
+            android:name="lockyluo.x5corelibrary.FullScreenActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/app_name"></activity>
         <activity
-            android:name="com.example.x5corelibrary.FilechooserActivity"
+            android:name="lockyluo.x5corelibrary.FilechooserActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/app_name"></activity>
         <activity
-            android:name="com.example.x5corelibrary.BrowserActivity"
+            android:name="lockyluo.x5corelibrary.BrowserActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/app_name"
             android:launchMode="standard"></activity>

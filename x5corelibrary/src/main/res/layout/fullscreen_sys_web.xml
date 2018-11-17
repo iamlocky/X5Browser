@@ -2,11 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    <com.example.webview_x5browser.utils.SystemWebView
+    <com.lockyluo.webview_x5browser.utils.SystemWebView
         android:layout_height="fill_parent"
         android:layout_width="fill_parent"
         android:id="@+id/full_sys_web_webview"
-        ></com.example.webview_x5browser.utils.SystemWebView>
+        ></com.lockyluo.webview_x5browser.utils.SystemWebView>
     
     	
 
